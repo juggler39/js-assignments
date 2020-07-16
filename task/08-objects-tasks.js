@@ -108,69 +108,74 @@ function fromJSON(proto, json) {
  *  For more examples see unit tests.
  */
 
+class CssSelector {
+
+    constructor() {
+        this.selector = '';
+        this.uniqueError = 'Element, id and pseudo-element should not occur more then one time inside the selector';
+        this.orderError = 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element';
+    }
+
+    element(value) {
+        this.check(1);
+        this.selector += value;
+        return this;
+    }
+
+    id(value) {
+        this.check(2);
+        this.selector += `#${value}`;
+        return this;
+    }
+
+    class(value) {
+        this.check(3);
+        this.selector += `.${value}`;
+        return this;
+    }
+
+    attr(value) {
+        this.check(4);
+        this.selector += `[${value}]`;
+        return this;
+    }
+
+    pseudoClass(value) {
+        this.check(5);
+        this.selector += `:${value}`;
+        return this;
+    }
+
+    pseudoElement(value) {
+        this.check(6);
+        this.selector += `::${value}`;
+        return this;
+    }
+
+    combine(selector1, combinator, selector2) {
+        this.selector = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+        return this;
+    }
+
+    stringify() {
+        return this.selector;
+    }
+
+    check(type) {
+        if (type < this.type) throw this.orderError;
+        if (type === this.type && [1, 2, 6].includes(type)) throw this.uniqueError;
+        this.type = type;
+    }
+}
+
 const cssSelectorBuilder = {
-    result: '',
-    order: 0,
-
-    element: function (value) {
-        this.checkOrder(0);
-        this.result += value;
-        return this.createSelector('element');
-    },
-
-    id: function (value) {
-        this.checkOrder(1);
-        this.result += `#${value}`;
-        return this.createSelector('id');
-    },
-
-    class: function (value) {
-        this.checkOrder(2);
-        this.result += `.${value}`;
-        return this.createSelector();
-    },
-
-    attr: function (value) {
-        this.checkOrder(3);
-        this.result += `[${value}]`;
-        return this.createSelector();
-    },
-
-    pseudoClass: function (value) {
-        this.checkOrder(4);
-        this.result += `:${value}`;
-        return this.createSelector();
-    },
-
-    pseudoElement: function (value) {
-        this.checkOrder(5);
-        this.result += `::${value}`;
-        return this.createSelector('pseudoElement');
-    },
-
-    combine: function (selector1, combinator, selector2) {
-        this.result = selector1.stringify() + ' ' + combinator + ' ' + selector2.stringify();
-        return this.createSelector();
-    },
-
-    stringify: function () {
-        return this.result;
-    },
-
-    checkOrder: function (n) {
-        if (n < this.order) {
-            throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
-        }
-        this.order = n;
-    },
-
-    createSelector: function (elem) {
-        let obj = {...this};
-        obj[elem] = () => {throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector')};
-        this.result = '';
-        this.order = 0;
-        return obj;
-    },
+    element: (value) => new CssSelector().element(value),
+    id: (value) => new CssSelector().id(value),
+    class: (value) => new CssSelector().class(value),
+    attr: (value) => new CssSelector().attr(value),
+    pseudoClass: (value) => new CssSelector().pseudoClass(value),
+    pseudoElement: (value) => new CssSelector().pseudoElement(value),
+    combine: (selector1, combinator, selector2) => new CssSelector().combine(selector1, combinator, selector2)
 };
 
 module.exports = {
