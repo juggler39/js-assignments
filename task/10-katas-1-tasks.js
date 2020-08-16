@@ -1,4 +1,4 @@
-git add'use strict';
+'use strict';
 
 /**
  * Returns the array of 32 compass points and heading.
