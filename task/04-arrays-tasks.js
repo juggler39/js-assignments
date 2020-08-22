@@ -85,7 +85,7 @@ function getArrayOfPositives(arr) {
  *    [ 'cat, 'dog', 'raccon' ] => [ 'cat', 'dog', 'racoon' ]
  */
 function getArrayOfStrings(arr) {
-   return arr.filter(elem => typeof(elem)=='string');
+   return arr.filter(elem => typeof(elem) === 'string');
 }
 
 /**
@@ -303,7 +303,7 @@ function get3TopItems(arr) {
  *   [ 1, '2' ] => 1
  */
 function getPositivesCount(arr) {
-    return arr.filter(elem => typeof (elem) == 'number' && elem > 0).length;
+    return arr.filter(elem => typeof (elem) === 'number' && elem > 0).length;
 }
  
 /** 
@@ -353,7 +353,7 @@ function getItemsSum(arr) {
  *  [ null, undefined, NaN, false, 0, '' ]  => 6
  */
 function getFalsyValuesCount(arr) {
-    return arr.filter(elem => !Boolean(elem)).length;
+    return arr.filter(elem => !(elem)).length;
 }
 
 /**
