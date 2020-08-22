@@ -28,7 +28,29 @@
  *   'NULL'      => false 
  */
 function findStringInSnakingPuzzle(puzzle, searchStr) {
-    throw new Error('Not implemented');
+    const h = puzzle.length;
+    const w = puzzle[0].length;
+    const dx = [1, 0, -1, 0];
+    const dy = [0, 1, 0, -1];
+    const used = Array(h).fill(0).map(() => [w].fill(false));
+    function find(y, x, pos) {
+        if (pos === searchStr.length) return true;
+        if (!(y >= 0 && y < h && x >= 0 && x < w)
+            || used[y][x] || searchStr[pos] !== puzzle[y][x]) return false;
+        used[y][x] = true;
+        for (let i = 0; i < 4; i++) {
+            let ny = y + dy[i];
+            let nx = x + dx[i];
+            if (find(ny, nx, pos + 1)) return true;
+        }
+        used[y][x] = false;
+    }
+    for (let i = 0; i < puzzle.length; i++)
+        for (let j = 0; j < puzzle[0].length; j++) {
+            for (let i = 0; i < used.length; i++) used[i].fill(false);
+            if (find(i, j, 0)) return true;
+        }
+    return false;
 }
 
 
@@ -45,7 +67,28 @@ function findStringInSnakingPuzzle(puzzle, searchStr) {
  *    'abc' => 'abc','acb','bac','bca','cab','cba'
  */
 function* getPermutations(chars) {
-    throw new Error('Not implemented');
+
+    const list = [];
+    function permutation(start) {
+        if (start === chars.length) {
+            list.push(chars);
+            return;
+        }
+        for (let i = start; i < chars.length; i++) {
+            chars = swap(chars, start, i);
+            permutation(start + 1);
+            chars = swap(chars, start, i);
+        }
+    }
+    permutation(0);
+
+    for (let x of list) yield x;
+
+    function swap(str, i, j) {
+        const s = [...str];
+        [s[i], s[j]] = [s[j], s[i]];
+        return s.join('');
+    }
 }
 
 
@@ -65,7 +108,20 @@ function* getPermutations(chars) {
  *    [ 1, 6, 5, 10, 8, 7 ] => 18  (buy at 1,6,5 and sell all at 10)
  */
 function getMostProfitFromStockQuotes(quotes) {
-    throw new Error('Not implemented');
+    let profit = 0;
+    let maxPos = 0;
+    let i = 0;
+    while (maxPos !== quotes.length) {
+        for (let j = maxPos; j < quotes.length; j++) {
+            maxPos = quotes[maxPos] < quotes[j] ? j : maxPos;
+        }
+        while (i !== maxPos) {
+            profit += quotes[maxPos] - quotes[i++];
+        }
+        maxPos++;
+        i++;
+    }
+    return profit;
 }
 
 
@@ -92,14 +148,28 @@ function UrlShortener() {
 UrlShortener.prototype = {
 
     encode: function(url) {
-        throw new Error('Not implemented');
-    },
-    
-    decode: function(code) {
-        throw new Error('Not implemented');
-    } 
-}
 
+        const s = url.split('').map(x => this.urlAllowedChars.indexOf(x)+1);
+        let result='';
+        for (let i = 0; i < s.length; i +=2) {
+            result += String.fromCharCode(s[i]*128 + (s[i+1]||0));
+        }
+
+        return result;
+    },
+
+    decode: function(code) {
+
+        const s = code.split('').map((_, i) => code.charCodeAt(i));
+        let result='';
+        for (let i = 0; i < s.length; i++) {
+            result += this.urlAllowedChars[Math.floor(s[i]/128)-1];
+            result += s[i]%128 ? this.urlAllowedChars[s[i]%128-1] : '';
+        }
+
+        return result;
+    }
+};
 
 module.exports = {
     findStringInSnakingPuzzle: findStringInSnakingPuzzle,
